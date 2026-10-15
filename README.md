@@ -8,6 +8,7 @@ Cursor, Gemini CLI, GitHub Copilot, …).
 | Skill | Cosa fa |
 |---|---|
 | `wrap-up` | Chiusura di sessione: ticket aggiornati, lavoro committato e mergiato, worktree tolti. |
+| `call-input` | Dalla trascrizione di una call al tracker: estrae i prossimi passi e propone quali ticket aprire, modificare o chiudere. |
 
 ## Installazione
 
