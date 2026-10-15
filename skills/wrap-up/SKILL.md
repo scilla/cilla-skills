@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: Close a session — its tickets updated, its work committed and merged, its worktrees removed.
+description: Close a session when the user asks to wrap up — its tickets updated, its work committed and merged, its worktrees removed.
 disable-model-invocation: true
 ---
 
@@ -11,18 +11,18 @@ Close this session's work so nothing it started is left half-done: tickets that 
 List everything this session touched:
 
 - tickets it acted on, edited or created;
-- branches and worktrees it created, subagents' `isolation: "worktree"` ones included (the Agent result names path and branch);
+- branches and worktrees it created, subagents' included (in Claude Code, an Agent run with `isolation: "worktree"` names path and branch in its result);
 - commits it made, and files it changed without committing.
 
-The conversation is the source; after a compaction, re-read the session transcript (`~/.claude/projects/<project>/<session-id>.jsonl`). Git is only the cross-check: other sessions may commit in this same checkout under the same author, and their worktrees and dirty files look exactly like this session's. A file or branch you cannot place in the footprint is someone else's.
+The conversation is the source; after a compaction, re-read the session's saved transcript (Claude Code: `~/.claude/projects/<project>/<session-id>.jsonl`; other agents keep their own session log). Git is only the cross-check: other sessions may commit in this same checkout under the same author, and their worktrees and dirty files look exactly like this session's. A file or branch you cannot place in the footprint is someone else's.
 
-Also note the start sha: the first line of "Recent commits" in the git status snapshot that opened the session.
+Also note the start sha, the HEAD the session started from. Claude Code shows it as the first line of "Recent commits" in the git status that opens the session; otherwise take it from `git reflog --date=iso`, the last entry before the session began.
 
 Done when every footprint item has a path or a name.
 
 ## 2. Report
 
-From the repo root, with `<skill-dir>` this skill's base directory:
+From the repo root, with `<skill-dir>` the directory holding this `SKILL.md`:
 
 ```bash
 node <skill-dir>/scripts/check.mjs --fetch --since <start-sha>
@@ -66,7 +66,7 @@ For each footprint worktree, act on the report's verdict:
 - `cartella sparita` → `git worktree prune`;
 - dirty, or with commits outside the base → back to step 4 or 5.
 
-The worktree this session runs in stays: the app archives it with the session.
+The worktree this session itself runs in stays: whatever started the session there (in Claude Code, the desktop app) removes it with the session.
 
 `rimovibile` worktrees outside the footprint are leftovers of past sessions: list them and offer to remove them all in one question.
 
@@ -80,4 +80,4 @@ One line per area (tickets, commits, merge, worktrees) marked ✅ / ⚠️ / ❌
 - what the report showed outside the footprint, left alone;
 - commits in the base not yet pushed.
 
-If the session's work is unfinished, suggest `/handoff`.
+If the session's work is unfinished, suggest a handoff (the `handoff` skill, where installed).

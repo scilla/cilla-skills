@@ -1,7 +1,9 @@
-# claude-skills
+# cilla-skills
 
-Skill personali per Claude Code, una cartella per skill in `skills/<nome>/`
-con il suo `SKILL.md` e gli eventuali script.
+Skill personali nel formato [Agent Skills](https://agentskills.io): una
+cartella per skill in `skills/<nome>/`, con il suo `SKILL.md` e gli eventuali
+script. Valgono per ogni agente che legge il formato (Claude Code, Codex,
+Cursor, Gemini CLI, GitHub Copilot, …).
 
 | Skill | Cosa fa |
 |---|---|
@@ -13,9 +15,15 @@ con il suo `SKILL.md` e gli eventuali script.
 ./link.sh
 ```
 
-Collega ogni skill in `~/.claude/skills/<nome>` con un symlink, così una
-modifica qui vale subito in tutte le sessioni. Salta, avvisando, i nomi già
-presenti che non puntano qui.
+Collega ogni skill nella cartella globale di ogni agente installato
+(`~/.claude/skills`, `~/.codex/skills`, …), così una modifica qui vale subito
+ovunque. `./link.sh claude codex` limita agli agenti nominati; Continue entra
+solo se nominato. I nomi già occupati da altro restano come sono; i link
+rimasti appesi dopo uno spostamento della repo vengono rifatti.
+
+`disable-model-invocation: true` lo rispetta solo Claude Code, dove la skill
+parte unicamente a comando. Gli altri agenti leggono la `description`, che per
+questo dice quando usarla.
 
 ## Test
 
