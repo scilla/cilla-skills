@@ -110,9 +110,9 @@ test("branch verdicts: long-lived and parked are left alone, worktree branches a
   assert.equal(branchVerdict({ name: "main", ahead: 0, worktreePath: ROOT }, OPTIONS), "base");
   assert.equal(branchVerdict({ name: "production", ahead: 5, worktreePath: null }, OPTIONS), "base");
   assert.equal(branchVerdict({ name: "trunk", ahead: 0, worktreePath: null }, { ...OPTIONS, base: "trunk" }), "base");
-  assert.equal(branchVerdict({ name: "accantonato/login-b", ahead: 4, worktreePath: null }, OPTIONS), "parked");
+  assert.equal(branchVerdict({ name: "parked/login-b", ahead: 4, worktreePath: null }, OPTIONS), "parked");
   assert.equal(
-    branchVerdict({ name: "wip/old", ahead: 4, worktreePath: null }, { ...OPTIONS, parked: ["wip/"] }),
+    branchVerdict({ name: "accantonato/old", ahead: 4, worktreePath: null }, { ...OPTIONS, parked: ["accantonato/"] }),
     "parked",
   );
   assert.equal(branchVerdict({ name: "worktree-agent-1", ahead: 1, worktreePath: "/w" }, OPTIONS), "in-worktree");
@@ -123,7 +123,7 @@ test("branch verdicts: long-lived and parked are left alone, worktree branches a
 test("a clean repo renders as nothing to fix", () => {
   const { text, attention } = renderReport(report());
   assert.equal(attention, 0);
-  assert.match(text, /✓ niente da sistemare$/);
+  assert.match(text, /✓ nothing to fix$/);
 });
 
 test("removable worktrees and merged leftovers come with their command and do not count as attention", () => {
@@ -149,8 +149,8 @@ test("each blocker counts once, and AGENTS.md gets the next dev hint", () => {
   );
   // not on main, dirty main checkout, unmerged worktree, unmerged branch
   assert.equal(attention, 4);
-  assert.match(text, /AGENTS\.md {3}\(se è il blocco riscritto da next dev/);
-  assert.match(text, /⚠ 4 cose da guardare$/);
+  assert.match(text, /AGENTS\.md {3}\(if it is the block next dev rewrites/);
+  assert.match(text, /⚠ 4 items to look at$/);
 });
 
 test("a server still running inside a worktree is listed with its pid", () => {
@@ -163,13 +163,13 @@ test("a server still running inside a worktree is listed with its pid", () => {
       ],
     }),
   );
-  assert.match(text, /processo in ascolto dentro/);
-  assert.match(text, /pid 4242 node su 3101 \(kill 4242\)/);
+  assert.match(text, /listening process inside/);
+  assert.match(text, /pid 4242 node on 3101 \(kill 4242\)/);
 });
 
 test("the report names the base it was given", () => {
   const { text } = renderReport(
     report({ base: "master", mainBranch: "master", sync: { ahead: 2, behind: 0, fetched: false } }),
   );
-  assert.match(text, /master: 2 avanti, 0 indietro rispetto a origin\/master \(senza fetch/);
+  assert.match(text, /master: 2 ahead, 0 behind origin\/master \(not fetched/);
 });

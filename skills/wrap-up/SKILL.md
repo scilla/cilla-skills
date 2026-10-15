@@ -28,7 +28,7 @@ From the repo root, with `<skill-dir>` the directory holding this `SKILL.md`:
 node <skill-dir>/scripts/check.mjs --fetch --since <start-sha>
 ```
 
-Read-only, whole repo. Add `--parked <prefix>` for a prefix the repo parks branches under, beyond the defaults `accantonato/` and `parked/`. Map each line onto the footprint; lines outside it go into the final report as not this session's, untouched.
+Read-only, whole repo. Add `--parked <prefix>` for a prefix the repo parks branches under, beyond the default `parked/`. Map each line onto the footprint; lines outside it go into the final report as not this session's, untouched.
 
 ## 3. Tickets
 
@@ -60,15 +60,15 @@ Done when the report shows no footprint branch or worktree with commits outside 
 
 For each footprint worktree, act on the report's verdict:
 
-- `rimovibile` → run the command the report prints (`git worktree remove`, then `git branch -d`, which refuses an unmerged branch by itself);
-- `processo in ascolto` → an agent's dev server or `next start`: `kill` the pid the report names, then re-run the report;
+- `removable` → run the command the report prints (`git worktree remove`, then `git branch -d`, which refuses an unmerged branch by itself);
+- `listening process` → an agent's dev server or `next start`: `kill` the pid the report names, then re-run the report;
 - `locked` → `git worktree remove -f -f` once the user confirms;
-- `cartella sparita` → `git worktree prune`;
+- `missing directory` → `git worktree prune`;
 - dirty, or with commits outside the base → back to step 4 or 5.
 
 The worktree this session itself runs in stays: whatever started the session there (in Claude Code, the desktop app) removes it with the session.
 
-`rimovibile` worktrees outside the footprint are leftovers of past sessions: list them and offer to remove them all in one question.
+`removable` worktrees outside the footprint are leftovers of past sessions: list them and offer to remove them all in one question.
 
 Done when a re-run of the report shows no footprint worktree.
 

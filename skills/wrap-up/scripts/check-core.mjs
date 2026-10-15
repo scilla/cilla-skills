@@ -126,7 +126,7 @@ export function worktreeVerdict(worktree) {
 /** Long-lived branches: never cleanup, whatever they hold. */
 export const LONG_LIVED = ["main", "master", "production", "staging", "develop"];
 /** Branches parked on purpose; `--parked <prefix>` adds more. */
-export const DEFAULT_PARKED = ["accantonato/", "parked/"];
+export const DEFAULT_PARKED = ["parked/"];
 
 /** @typedef {{ name: string; ahead: number; worktreePath: string | null }} BranchFacts */
 /** @typedef {"base" | "parked" | "in-worktree" | "unmerged" | "merged"} BranchVerdict */
@@ -163,7 +163,7 @@ export function branchVerdict(branch, { base, parked }) {
  */
 function dirtyLine(line) {
   return line.endsWith(" AGENTS.md")
-    ? `${line}   (se è il blocco riscritto da next dev: si committa con il lavoro)`
+    ? `${line}   (if it is the block next dev rewrites: commit it with the work)`
     : line;
 }
 
@@ -180,30 +180,30 @@ function worktreeLines(worktree, report) {
   const lines = (() => {
     switch (worktreeVerdict(worktree)) {
       case "prunable":
-        return [`⚠ cartella sparita  ${name}`, "    git worktree prune"];
+        return [`⚠ missing directory  ${name}`, "    git worktree prune"];
       case "dirty":
         return [
-          `⚠ modifiche non committate  ${name}`,
+          `⚠ uncommitted changes  ${name}`,
           ...worktree.dirty.map((line) => `    ${dirtyLine(line)}`),
         ];
       case "unmerged":
-        return [`⚠ ${worktree.ahead} commit non in ${report.base}  ${name}`];
+        return [`⚠ ${worktree.ahead} commit(s) not in ${report.base}  ${name}`];
       case "busy":
-        return [`⚠ processo in ascolto dentro  ${name}`];
+        return [`⚠ listening process inside  ${name}`];
       case "locked":
         return [
-          `⚠ locked${worktree.locked ? ` (${worktree.locked})` : ""}, mergiato e pulito  ${name}`,
-          `    git worktree remove -f -f ${worktree.path}  (dopo conferma)`,
+          `⚠ locked${worktree.locked ? ` (${worktree.locked})` : ""}, merged and clean  ${name}`,
+          `    git worktree remove -f -f ${worktree.path}  (once confirmed)`,
         ];
       case "removable":
         return [
-          `· rimovibile: mergiato e pulito  ${name}`,
+          `· removable: merged and clean  ${name}`,
           `    git worktree remove ${worktree.path}${worktree.branch ? ` && git branch -d ${worktree.branch}` : ""}`,
         ];
     }
   })();
   for (const l of worktree.listeners) {
-    lines.push(`    pid ${l.pid} ${l.command} su ${l.ports.join(", ") || "?"} (kill ${l.pid})`);
+    lines.push(`    pid ${l.pid} ${l.command} on ${l.ports.join(", ") || "?"} (kill ${l.pid})`);
   }
   return lines;
 }
@@ -219,11 +219,11 @@ function branchLine(branch, report) {
     case "in-worktree":
       return null;
     case "parked":
-      return `· accantonato, si lascia: ${branch.name}`;
+      return `· parked, left alone: ${branch.name}`;
     case "unmerged":
-      return `⚠ ${branch.ahead} commit non in ${report.base}: ${branch.name}`;
+      return `⚠ ${branch.ahead} commit(s) not in ${report.base}: ${branch.name}`;
     case "merged":
-      return `· mergiato, rimasto: ${branch.name}    git branch -d ${branch.name}`;
+      return `· merged, left over: ${branch.name}    git branch -d ${branch.name}`;
   }
 }
 
@@ -235,28 +235,28 @@ function branchLine(branch, report) {
  */
 export function renderReport(report) {
   const { base } = report;
-  const out = ["wrap-up: controllo di chiusura (sola lettura)", ""];
+  const out = ["wrap-up: end-of-session check (read-only)", ""];
 
-  out.push(`Checkout principale  ${report.mainPath} su ${report.mainBranch ?? "HEAD staccato"}`);
-  if (report.mainBranch !== base) out.push(`  ⚠ non è su ${base}`);
-  if (report.mainDirty.length === 0) out.push("  ✓ pulito");
+  out.push(`Main checkout  ${report.mainPath} on ${report.mainBranch ?? "detached HEAD"}`);
+  if (report.mainBranch !== base) out.push(`  ⚠ not on ${base}`);
+  if (report.mainDirty.length === 0) out.push("  ✓ clean");
   else {
-    out.push(`  ⚠ ${report.mainDirty.length} file non committat${report.mainDirty.length === 1 ? "o" : "i"}`);
+    out.push(`  ⚠ ${report.mainDirty.length} uncommitted file${report.mainDirty.length === 1 ? "" : "s"}`);
     out.push(...report.mainDirty.map((line) => `    ${dirtyLine(line)}`));
   }
-  if (report.sync === null) out.push(`  · origin/${base} non esiste`);
+  if (report.sync === null) out.push(`  · no origin/${base}`);
   else {
     const { ahead, behind, fetched } = report.sync;
-    const freshness = fetched ? "" : " (senza fetch: --fetch per il dato fresco)";
+    const freshness = fetched ? "" : " (not fetched: --fetch for fresh data)";
     out.push(
       ahead === 0 && behind === 0
-        ? `  ✓ ${base} allineato a origin/${base}${freshness}`
-        : `  · ${base}: ${ahead} avanti, ${behind} indietro rispetto a origin/${base}${freshness}`,
+        ? `  ✓ ${base} in sync with origin/${base}${freshness}`
+        : `  · ${base}: ${ahead} ahead, ${behind} behind origin/${base}${freshness}`,
     );
   }
 
-  out.push("", `Worktree (${report.worktrees.length})`);
-  if (report.worktrees.length === 0) out.push("  ✓ nessuno oltre al checkout principale");
+  out.push("", `Worktrees (${report.worktrees.length})`);
+  if (report.worktrees.length === 0) out.push("  ✓ none besides the main checkout");
   for (const worktree of report.worktrees) {
     out.push(...worktreeLines(worktree, report).map((line) => `  ${line}`));
   }
@@ -264,18 +264,18 @@ export function renderReport(report) {
   const branchLines = report.branches
     .map((branch) => branchLine(branch, report))
     .filter((line) => line !== null);
-  out.push("", "Branch locali fuori dai worktree");
-  if (branchLines.length === 0) out.push("  ✓ nessuno da sistemare");
+  out.push("", "Local branches outside worktrees");
+  if (branchLines.length === 0) out.push("  ✓ nothing to fix");
   out.push(...branchLines.map((line) => `  ${line}`));
 
   if (report.session) {
     const { since, commits } = report.session;
-    out.push("", `Commit su ${base} da ${since.slice(0, 8)} (${commits.length}, anche di altre sessioni)`);
+    out.push("", `Commits on ${base} since ${since.slice(0, 8)} (${commits.length}, other sessions' included)`);
     out.push(...commits.map((line) => `  ${line}`));
   }
 
   const attention = out.filter((line) => line.trimStart().startsWith("⚠")).length;
   const verdict =
-    attention === 0 ? "✓ niente da sistemare" : `⚠ ${attention} ${attention === 1 ? "cosa" : "cose"} da guardare`;
+    attention === 0 ? "✓ nothing to fix" : `⚠ ${attention} item${attention === 1 ? "" : "s"} to look at`;
   return { text: `${out.join("\n")}\n\n${verdict}`, attention };
 }

@@ -19,7 +19,7 @@ home_of() {
     gemini) echo "$HOME/.gemini" ;;
     copilot) echo "$HOME/.copilot" ;;
     continue) echo "$HOME/.continue" ;;
-    *) echo "agente sconosciuto: $1 (claude, codex, cursor, gemini, copilot, continue)" >&2; exit 1 ;;
+    *) echo "unknown agent: $1 (claude, codex, cursor, gemini, copilot, continue)" >&2; exit 1 ;;
   esac
 }
 
@@ -28,7 +28,7 @@ if [ $# -gt 0 ]; then agents=("$@"); else agents=(claude codex cursor gemini cop
 for agent in "${agents[@]}"; do
   home="$(home_of "$agent")"
   if [ ! -d "$home" ]; then
-    echo "$agent: non installato ($home), salto"
+    echo "$agent: not installed ($home), skipped"
     continue
   fi
   mkdir -p "$home/skills"
@@ -41,12 +41,12 @@ for agent in "${agents[@]}"; do
     elif [ -L "$dest" ] && [ ! -e "$dest" ]; then
       # A dangling link (the repo moved): nothing to lose in replacing it.
       ln -sfn "$src" "$dest"
-      echo "$agent: ricollegata $name"
+      echo "$agent: relinked $name"
     elif [ -e "$dest" ] || [ -L "$dest" ]; then
-      echo "$agent: saltata $name, $dest esiste e non punta qui" >&2
+      echo "$agent: skipped $name, $dest exists and points elsewhere" >&2
     else
       ln -s "$src" "$dest"
-      echo "$agent: collegata $name"
+      echo "$agent: linked $name"
     fi
   done
 done
