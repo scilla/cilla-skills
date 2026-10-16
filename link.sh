@@ -4,9 +4,10 @@
 #   ./link.sh                  # claude codex cursor gemini copilot, those installed
 #   ./link.sh claude continue  # just these
 #
-# The folders are the ones the `skills` CLI (vercel-labs/skills 1.7.0) uses
-# per agent. ~/.agents/skills is left out: it is that CLI's own store, and
-# none of these agents reads it. Continue is opt-in.
+# The folders are the ones the `skills` CLI (vercel-labs/skills) uses per
+# agent. ~/.agents/skills is left out because it is that CLI's own store, and
+# Codex, which reads it besides ~/.codex/skills, would list each skill twice.
+# Continue is opt-in.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")" && pwd)"
