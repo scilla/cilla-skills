@@ -127,12 +127,12 @@ test("branch verdicts: long-lived and parked are left alone, worktree branches a
   assert.equal(branchVerdict({ name: "trunk", ahead: 0, worktreePath: null }, { ...OPTIONS, base: "trunk" }), "base");
   assert.equal(branchVerdict({ name: "parked/login-b", ahead: 4, worktreePath: null }, OPTIONS), "parked");
   assert.equal(
-    branchVerdict({ name: "accantonato/old", ahead: 4, worktreePath: null }, { ...OPTIONS, parked: ["accantonato/"] }),
+    branchVerdict({ name: "archive/old", ahead: 4, worktreePath: null }, { ...OPTIONS, parked: ["archive/"] }),
     "parked",
   );
   assert.equal(branchVerdict({ name: "worktree-agent-1", ahead: 1, worktreePath: "/w" }, OPTIONS), "in-worktree");
-  assert.equal(branchVerdict({ name: "integrazione", ahead: 1, worktreePath: null }, OPTIONS), "unmerged");
-  assert.equal(branchVerdict({ name: "integrazione", ahead: 0, worktreePath: null }, OPTIONS), "merged");
+  assert.equal(branchVerdict({ name: "integration", ahead: 1, worktreePath: null }, OPTIONS), "unmerged");
+  assert.equal(branchVerdict({ name: "integration", ahead: 0, worktreePath: null }, OPTIONS), "merged");
 });
 
 test("a clean repo renders as nothing to fix", () => {
@@ -156,7 +156,7 @@ test("removable worktrees and merged leftovers come with their command and do no
 test("each blocker counts once", () => {
   const { text, attention } = renderReport(
     report({
-      mainBranch: "integrazione",
+      mainBranch: "integration",
       mainDirty: [" M AGENTS.md", " M src/a.ts"],
       worktrees: [worktree({ ahead: 2 })],
       branches: [{ name: "feature/x", ahead: 1, worktreePath: null }],

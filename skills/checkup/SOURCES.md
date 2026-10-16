@@ -9,7 +9,7 @@ Where each dimension's data lives in Claude Code. Other agents keep their own se
 - A user prompt is an event with `type: "user"` whose content is a string or text blocks. Leave out `tool_result` blocks, system reminders and command wrappers.
 - A skill run leaves one of three marks: the text "Base directory for this skill: .../skills/<name>", a `Skill` tool call, or `<command-name>/<name></command-name>` in a prompt. Count sessions, not lines.
 - An MCP call is a tool call named `mcp__<server>__<tool>`. Connectors from claude.ai carry a UUID as the server name, so map it to a connector through its tool names.
-- Friction worth counting: pushback ("no", "ti avevo detto", "di nuovo"), `[Request interrupted by user]`, denied tool calls, instructions retyped across sessions, long sessions with compactions.
+- Friction worth counting: pushback in the user's language ("no", "that's not what I asked", "again"), `[Request interrupted by user]`, denied tool calls, instructions retyped across sessions, long sessions with compactions.
 
 ## Setup
 

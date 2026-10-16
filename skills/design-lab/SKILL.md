@@ -1,6 +1,6 @@
 ---
 name: design-lab
-description: Design-lab variants of a page, section or component on the app's /design-lab route, for the user to compare, pick and combine. Use when the user asks for variants on the /design-lab route or opens a cantiere.
+description: Design-lab variants of a page, section or component on the app's /design-lab route, for the user to compare, pick and combine. Use when the user asks for variants on the /design-lab route or opens a new lab subject.
 disable-model-invocation: true
 ---
 
@@ -8,7 +8,7 @@ The lab is a route of the app, `/design-lab`, where design questions are answere
 
 ## 0. The lab
 
-Find the existing lab and follow its conventions: how subjects are named (numbered cantieri, slugs), the index page, the sample data, the styles. If there is none, create one:
+Find the existing lab and follow its conventions: how subjects are named (numbered, or by slug), the index page, the sample data, the styles. If there is none, create one:
 
 - a single layout gating all of `/design-lab`: `404` and `noindex` in production, or admin-only there if the user wants reviewers to see it; open locally and on preview or staging;
 - an index page with one line per subject: its link and the question it asks;

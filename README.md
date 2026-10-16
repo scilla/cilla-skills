@@ -1,40 +1,48 @@
 # cilla-skills
 
-Skill personali nel formato [Agent Skills](https://agentskills.io). Ogni skill
-ha una cartella in `skills/<nome>/`, con il suo `SKILL.md` e gli eventuali
-script. Valgono per ogni agente che legge il formato (Claude Code, Codex,
-Cursor, Gemini CLI, GitHub Copilot e altri).
+Personal skills in the [Agent Skills](https://agentskills.io) format. Each skill
+has a folder in `skills/<name>/` with its `SKILL.md` and any scripts. They work
+with every agent that reads the format: Claude Code, Codex, Cursor, Gemini CLI,
+GitHub Copilot and others.
 
-| Skill | Cosa fa |
+| Skill | What it does |
 |---|---|
-| `wrap-up` | Chiusura di sessione: ticket aggiornati, lavoro committato e mergiato, worktree tolti. |
-| `call-input` | Dalla trascrizione di una call al tracker: estrae i prossimi passi e propone quali ticket aprire, modificare o chiudere. |
-| `dispatch` | I ticket pronti ad agenti paralleli nei worktree, poi integrazione, controlli completi una volta sola e approdo sul branch base. |
-| `dispatch-and-triage` | Triage dei ticket in sospeso una domanda alla volta; ogni ticket che diventa pronto parte subito con `dispatch`. |
-| `design-lab` | Varianti di una pagina o di un componente sulla route `/design-lab`, da confrontare, scegliere e portare nel prodotto. |
-| `checkup` | Esame di come lavori con l'agente, nei repo e nella configurazione. Misura e consiglia, e non cambia nulla finché non scegli tu cosa applicare. |
+| `wrap-up` | Closes a session: tickets updated, work committed and merged, worktrees removed. |
+| `call-input` | Turns a call transcript into tracker changes. Extracts the next steps and proposes which tickets to open, update or close. |
+| `dispatch` | Hands ready tickets to parallel agents in worktrees, integrates their work, runs the full check once and lands it on the base branch. |
+| `dispatch-and-triage` | Triages pending tickets one question at a time and dispatches each ticket as soon as it is ready. |
+| `design-lab` | Builds variants of a page or component on the `/design-lab` route, to compare, pick and bring into the product. |
+| `checkup` | Examines how you work with the agent, in your repos and in your agent setup. It measures and recommends, and changes nothing until you choose what to apply. |
 
-## Installazione
+## Install
 
 ```bash
 ./link.sh
 ```
 
-Collega ogni skill nella cartella globale di ogni agente installato
-(`~/.claude/skills`, `~/.codex/skills` e così via), così una modifica qui vale subito
-ovunque. `./link.sh claude codex` limita agli agenti nominati; Continue entra
-solo se nominato. I nomi già occupati da altro restano come sono; i link
-rimasti appesi dopo uno spostamento della repo vengono rifatti.
+Links every skill into the global skills folder of each installed agent
+(`~/.claude/skills`, `~/.codex/skills` and so on), so an edit here applies
+everywhere at once. `./link.sh claude codex` limits it to the agents named;
+Continue is linked only when named. Names already taken by something else are
+left alone, and links left dangling after the repo moves are redone.
 
-Ogni skill parte solo a comando. Claude Code lo legge da
-`disable-model-invocation: true` nel frontmatter, Codex da
-`allow_implicit_invocation: false` in `agents/openai.yaml`. Gli altri agenti
-leggono la `description`, che per questo dice quando usarla.
+Every skill runs only when you invoke it. Claude Code reads that from
+`disable-model-invocation: true` in the frontmatter, Codex from
+`allow_implicit_invocation: false` in `agents/openai.yaml`. Other agents go by
+the `description`, so each one says when to use the skill.
 
-## Test
+## Tests
 
 ```bash
 node --test
 ```
 
-Solo Node, nessuna dipendenza.
+Node only, no dependencies.
+
+## Contact
+
+Questions and bug reports go in the [issues](https://github.com/scilla/cilla-skills/issues).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
