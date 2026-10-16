@@ -1,0 +1,5 @@
+interface:
+  display_name: "Design Lab"
+  short_description: "Compare design variants on the /design-lab route"
+policy:
+  allow_implicit_invocation: false

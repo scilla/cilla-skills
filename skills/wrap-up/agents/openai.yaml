@@ -1,0 +1,5 @@
+interface:
+  display_name: "Wrap-up"
+  short_description: "Close a session: tickets, commits, merges, worktrees"
+policy:
+  allow_implicit_invocation: false

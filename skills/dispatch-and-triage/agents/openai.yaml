@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dispatch and Triage"
+  short_description: "Triage pending tickets and dispatch the ready ones"
+policy:
+  allow_implicit_invocation: false

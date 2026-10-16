@@ -1,0 +1,5 @@
+interface:
+  display_name: "Checkup"
+  short_description: "Check how you work and recommend changes"
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dispatch"
+  short_description: "Hand ready tickets to parallel agents and land them"
+policy:
+  allow_implicit_invocation: false

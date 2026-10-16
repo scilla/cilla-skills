@@ -1,0 +1,5 @@
+interface:
+  display_name: "Call Input"
+  short_description: "Turn a call transcript into tracker changes"
+policy:
+  allow_implicit_invocation: false
