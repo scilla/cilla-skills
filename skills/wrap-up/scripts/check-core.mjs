@@ -5,6 +5,39 @@
 // runs git and lsof is `check.mjs`.
 
 /**
+ * @typedef {object} Args
+ * @property {boolean} fetch
+ * @property {string | null} since
+ * @property {string | null} base
+ * @property {string[]} parked Prefixes beyond `DEFAULT_PARKED`.
+ */
+
+/**
+ * Parses `check.mjs`'s arguments. Throws on an unknown flag or a missing
+ * value, so that `--since --fetch` does not read `--fetch` as the sha.
+ * @param {string[]} argv
+ * @returns {Args}
+ */
+export function parseArgs(argv) {
+  /** @type {Args} */
+  const args = { fetch: false, since: null, base: null, parked: [] };
+  for (let i = 0; i < argv.length; i++) {
+    const flag = argv[i];
+    if (flag === "--fetch") {
+      args.fetch = true;
+      continue;
+    }
+    if (!["--since", "--base", "--parked"].includes(flag)) throw new Error(`unknown argument: ${flag}`);
+    const value = argv[++i];
+    if (value === undefined || value.startsWith("-")) throw new Error(`${flag} needs a value`);
+    if (flag === "--since") args.since = value;
+    else if (flag === "--base") args.base = value;
+    else args.parked.push(value);
+  }
+  return args;
+}
+
+/**
  * @typedef {object} Worktree
  * @property {string} path
  * @property {string} head
@@ -157,17 +190,6 @@ export function branchVerdict(branch, { base, parked }) {
  */
 
 /**
- * `next dev` (Next 16) rewrites a block of AGENTS.md on its own: it belongs
- * to the work, not to a stray edit.
- * @param {string} line
- */
-function dirtyLine(line) {
-  return line.endsWith(" AGENTS.md")
-    ? `${line}   (if it is the block next dev rewrites: commit it with the work)`
-    : line;
-}
-
-/**
  * @param {WorktreeFacts} worktree
  * @param {Report} report
  * @returns {string[]}
@@ -184,7 +206,7 @@ function worktreeLines(worktree, report) {
       case "dirty":
         return [
           `⚠ uncommitted changes  ${name}`,
-          ...worktree.dirty.map((line) => `    ${dirtyLine(line)}`),
+          ...worktree.dirty.map((line) => `    ${line}`),
         ];
       case "unmerged":
         return [`⚠ ${worktree.ahead} commit(s) not in ${report.base}  ${name}`];
@@ -242,7 +264,7 @@ export function renderReport(report) {
   if (report.mainDirty.length === 0) out.push("  ✓ clean");
   else {
     out.push(`  ⚠ ${report.mainDirty.length} uncommitted file${report.mainDirty.length === 1 ? "" : "s"}`);
-    out.push(...report.mainDirty.map((line) => `    ${dirtyLine(line)}`));
+    out.push(...report.mainDirty.map((line) => `    ${line}`));
   }
   if (report.sync === null) out.push(`  · no origin/${base}`);
   else {

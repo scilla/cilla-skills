@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: Close a session when the user asks to wrap up — its tickets updated, its work committed and merged, its worktrees removed.
+description: Close a session when the user asks to wrap up, with its tickets updated, its work committed and merged and its worktrees removed.
 disable-model-invocation: true
 ---
 
@@ -14,7 +14,7 @@ List everything this session touched:
 - branches and worktrees it created, subagents' included (in Claude Code, an Agent run with `isolation: "worktree"` names path and branch in its result);
 - commits it made, and files it changed without committing.
 
-The conversation is the source; after a compaction, re-read the session's saved transcript (Claude Code: `~/.claude/projects/<project>/<session-id>.jsonl`; other agents keep their own session log). Git is only the cross-check: other sessions may commit in this same checkout under the same author, and their worktrees and dirty files look exactly like this session's. A file or branch you cannot place in the footprint is someone else's.
+The conversation is the source; after a compaction, re-read the session's saved transcript (Claude Code: `~/.claude/projects/<project>/<session-id>.jsonl`; other agents keep their own session log). Git is only the cross-check, because other sessions may commit in this same checkout under the same author, and their worktrees and dirty files look exactly like this session's. A file or branch you cannot place in the footprint is someone else's.
 
 Also note the start sha, the HEAD the session started from. Claude Code shows it as the first line of "Recent commits" in the git status that opens the session; otherwise take it from `git reflog --date=iso`, the last entry before the session began.
 
@@ -28,11 +28,11 @@ From the repo root, with `<skill-dir>` the directory holding this `SKILL.md`:
 node <skill-dir>/scripts/check.mjs --fetch --since <start-sha>
 ```
 
-Read-only, whole repo. Add `--parked <prefix>` for a prefix the repo parks branches under, beyond the default `parked/`. Map each line onto the footprint; lines outside it go into the final report as not this session's, untouched.
+Read-only, whole repo. Without an `origin` remote, `--fetch` is skipped and the report says so. Add `--parked <prefix>` for a prefix the repo parks branches under, beyond the default `parked/`. Map each line onto the footprint; lines outside it go into the final report as not this session's, untouched.
 
 ## 3. Tickets
 
-Find how the repo tracks work: its `AGENTS.md` / `CLAUDE.md` point to it. Apply its rules to every footprint ticket:
+Find how the repo tracks work. Its `AGENTS.md` / `CLAUDE.md` point to it. Apply its rules to every footprint ticket:
 
 - finished → closed the way the repo closes tickets, with the date and the commit SHA;
 - partial → its state says, with today's date, what is left and who holds it;
@@ -44,7 +44,7 @@ Done when every footprint ticket's state says what happened, dated today, and th
 
 ## 4. Commit
 
-Every footprint change is committed, in the main checkout and in each footprint worktree, in the message form `git log` shows. The `AGENTS.md` block `next dev` rewrites goes in with the work. A dirty file whose owner you cannot tell: ask the user.
+Every footprint change is committed, in the main checkout and in each footprint worktree, in the message form `git log` shows. A file a dev tool rewrote on its own while the session ran belongs to the footprint and goes in with the work (Next 16's `next dev`, for one, rewrites a block of `AGENTS.md`). Ask the user about any dirty file whose owner you cannot tell.
 
 Done when no footprint file appears in a dirty list of the report.
 
@@ -52,7 +52,7 @@ Done when no footprint file appears in a dirty list of the report.
 
 Every footprint branch reaches the base the repo's way: its docs, or the shape of `git log --merges`. A merge that brings in code goes through an integration branch: merge there, the repo's full check command green (its docs, its package scripts), then fast-forward the base. Re-read the base right before the fast-forward, since other sessions may commit to it while checks run; if it moved, merge it into the integration branch and check again. Parked branches stay as they are.
 
-Pushing is the user's call every time: ask, with the number of commits the base is ahead of origin. Production deploys are theirs.
+Pushing is the user's call every time. Ask, and give the number of commits the base is ahead of origin. Production deploys are theirs.
 
 Done when the report shows no footprint branch or worktree with commits outside the base.
 
@@ -66,18 +66,18 @@ For each footprint worktree, act on the report's verdict:
 - `missing directory` → `git worktree prune`;
 - dirty, or with commits outside the base → back to step 4 or 5.
 
-The worktree this session itself runs in stays: whatever started the session there (in Claude Code, the desktop app) removes it with the session.
+The worktree this session itself runs in stays, because whatever started the session there (in Claude Code, the desktop app) removes it with the session.
 
-`removable` worktrees outside the footprint are leftovers of past sessions: list them and offer to remove them all in one question.
+`removable` worktrees outside the footprint are leftovers of past sessions. List them and offer to remove them all in one question.
 
 Done when a re-run of the report shows no footprint worktree.
 
 ## 7. Final report
 
-One line per area (tickets, commits, merge, worktrees) marked ✅ / ⚠️ / ❌, then:
+One line per area (tickets, commits, merge, worktrees), each marked done, partial or blocked, then:
 
 - what is left, and who holds it;
 - what the report showed outside the footprint, left alone;
 - commits in the base not yet pushed.
 
-If the session's work is unfinished, suggest a handoff (the `handoff` skill, where installed).
+If the session's work is unfinished, suggest a handoff: the `handoff` skill where installed; otherwise, a note in the final report that lets a fresh session resume without this conversation (the goal, what is done with its commits, what is left with its tickets, and the branch or worktree it sits on).

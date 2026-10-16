@@ -4,7 +4,7 @@
 // the repo being closed:
 //
 //   node check.mjs                    # whole repo
-//   node check.mjs --fetch            # refresh origin/<base> first
+//   node check.mjs --fetch            # refresh origin/<base> first, if there is an origin
 //   node check.mjs --since <sha>      # plus the commits on <base> since <sha>
 //   node check.mjs --base <branch>    # when <base> is not origin's HEAD
 //   node check.mjs --parked <prefix>  # one more parked-branch prefix (repeatable)
@@ -19,9 +19,12 @@ import {
   DEFAULT_PARKED,
   isInside,
   joinListeners,
+  parseArgs,
   parseWorktreeList,
   renderReport,
 } from "./check-core.mjs";
+
+const USAGE = "usage: node check.mjs [--fetch] [--since <sha>] [--base <branch>] [--parked <prefix>]...";
 
 /**
  * @param {string} command
@@ -30,7 +33,11 @@ import {
  */
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });
-  return { ok: result.status === 0, out: (result.stdout ?? "").trimEnd() };
+  return {
+    ok: result.status === 0,
+    out: (result.stdout ?? "").trimEnd(),
+    err: (result.stderr ?? "").trim(),
+  };
 }
 
 /**
@@ -49,14 +56,16 @@ function git(args, cwd) {
 /** @param {string} output */
 const lines = (output) => output.split("\n").filter(Boolean);
 
-const argv = process.argv.slice(2);
-/** @param {string} flag */
-function values(flag) {
-  return argv.flatMap((arg, i) => (arg === flag && argv[i + 1] ? [argv[i + 1]] : []));
-}
-const fetch = argv.includes("--fetch");
-const since = values("--since")[0];
-const parked = [...DEFAULT_PARKED, ...values("--parked")];
+const args = (() => {
+  try {
+    return parseArgs(process.argv.slice(2));
+  } catch (error) {
+    console.error(`${error instanceof Error ? error.message : error}\n${USAGE}`);
+    process.exit(2);
+  }
+})();
+const { fetch, since } = args;
+const parked = [...DEFAULT_PARKED, ...args.parked];
 
 const [main, ...others] = parseWorktreeList(git(["worktree", "list", "--porcelain"]));
 const mainPath = main.path;
@@ -65,7 +74,7 @@ const mainPath = main.path;
 // of main/master that exists.
 const originHead = run("git", ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"], mainPath);
 const resolvedBase =
-  values("--base")[0] ||
+  args.base ||
   (originHead.ok ? originHead.out.replace(/^origin\//, "") : "") ||
   ["main", "master"].find((name) => run("git", ["rev-parse", "--verify", "--quiet", name], mainPath).ok) ||
   main.branch ||
@@ -74,7 +83,18 @@ const resolvedBase =
 /** @param {string} rev */
 const aheadOfBase = (rev) => Number(git(["rev-list", "--count", `${resolvedBase}..${rev}`], mainPath));
 
-if (fetch) git(["fetch", "--quiet", "origin", resolvedBase], mainPath);
+// Without an origin remote there is nothing to fetch, and the report says so.
+// A failed fetch (offline, base not on origin) keeps the last known
+// origin/<base>: the report still comes out, marked as not fetched.
+const hasRemote = run("git", ["remote", "get-url", "origin"], mainPath).ok;
+const fetched = (() => {
+  if (!fetch || !hasRemote) return false;
+  const result = run("git", ["fetch", "--quiet", "origin", resolvedBase], mainPath);
+  if (!result.ok) {
+    console.error(`git fetch origin ${resolvedBase} failed, using the last known origin/${resolvedBase}: ${result.err}`);
+  }
+  return result.ok;
+})();
 const hasOrigin = run("git", ["rev-parse", "--verify", "--quiet", `origin/${resolvedBase}`], mainPath).ok;
 const sync = hasOrigin
   ? (() => {
@@ -84,7 +104,7 @@ const sync = hasOrigin
       )
         .split(/\s+/)
         .map(Number);
-      return { ahead, behind, fetched: fetch };
+      return { ahead, behind, fetched };
     })()
   : null;
 

@@ -5,6 +5,7 @@ import {
   branchVerdict,
   DEFAULT_PARKED,
   joinListeners,
+  parseArgs,
   parseWorktreeList,
   renderReport,
   worktreeVerdict,
@@ -40,6 +41,20 @@ function report(overrides = {}) {
     ...overrides,
   };
 }
+
+test("parseArgs reads every flag, --parked repeated", () => {
+  assert.deepEqual(parseArgs([]), { fetch: false, since: null, base: null, parked: [] });
+  assert.deepEqual(
+    parseArgs(["--fetch", "--since", "abc123", "--base", "trunk", "--parked", "old/", "--parked", "wip/"]),
+    { fetch: true, since: "abc123", base: "trunk", parked: ["old/", "wip/"] },
+  );
+});
+
+test("parseArgs refuses a flag without its value and an unknown flag", () => {
+  assert.throws(() => parseArgs(["--since", "--fetch"]), /--since needs a value/);
+  assert.throws(() => parseArgs(["--base"]), /--base needs a value/);
+  assert.throws(() => parseArgs(["--parkd", "old/"]), /unknown argument: --parkd/);
+});
 
 test("parseWorktreeList reads branches, detached heads, locks and prunable entries", () => {
   const parsed = parseWorktreeList(`worktree /repo
@@ -138,7 +153,7 @@ test("removable worktrees and merged leftovers come with their command and do no
   assert.match(text, /git branch -d old-integration/);
 });
 
-test("each blocker counts once, and AGENTS.md gets the next dev hint", () => {
+test("each blocker counts once", () => {
   const { text, attention } = renderReport(
     report({
       mainBranch: "integrazione",
@@ -149,7 +164,7 @@ test("each blocker counts once, and AGENTS.md gets the next dev hint", () => {
   );
   // not on main, dirty main checkout, unmerged worktree, unmerged branch
   assert.equal(attention, 4);
-  assert.match(text, /AGENTS\.md {3}\(if it is the block next dev rewrites/);
+  assert.match(text, /^ {4} M AGENTS\.md$/m);
   assert.match(text, /⚠ 4 items to look at$/);
 });
 
