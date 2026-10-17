@@ -8,9 +8,9 @@ Turn the tracker's ready queue into commits on the base branch. Agents do the wo
 
 ## 1. Queue
 
-Find the tracker. Look in the project's `AGENTS.md` / `CLAUDE.md` and the docs they point to, then the git host's issues, then ask the user. Learn its states and how a ticket closes.
+Read the repo's tracker docs, `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`, if they exist. Without them, look in `AGENTS.md` / `CLAUDE.md` and the docs they point to, then in the git host's issues, then ask the user. When you had to search, offer to save what you found to `docs/agents/issue-tracker.md` for next time: where tickets live, which states exist, how a ticket is opened, updated and closed, and which index to regenerate. Learn the tracker's states and how a ticket closes.
 
-List every ticket in the tracker's ready-for-agent state, including those that exist only on unmerged branches. Read each one in full. A ticket that lacks what an agent needs to start, such as acceptance criteria or a product decision, goes back to triage with a one-line reason.
+List every ticket in the tracker's ready-for-agent state (or the tracker's word for it), including those that exist only on unmerged branches. Read each one in full. A ticket that lacks what an agent needs to start, such as acceptance criteria or a product decision, goes back to triage with a one-line reason.
 
 Plan the **slots**: at most three agents run at once. Tickets that touch the same files, or block one another, run in sequence.
 

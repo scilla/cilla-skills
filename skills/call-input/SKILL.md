@@ -19,11 +19,7 @@ The argument is one of: pasted text, a file path, or a meeting in a meeting-note
 
 ## 2. Find the tracker
 
-Look in this order, stopping at the first that answers:
-
-1. the project's agent instructions (`AGENTS.md`, `CLAUDE.md` or equivalent) and the documents they point to for issue tracking and triage labels;
-2. the git remote, if it has issues enabled (`gh issue list`, or the host's equivalent);
-3. the user.
+Read the repo's tracker docs, `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`, if they exist. Without them, look in `AGENTS.md` / `CLAUDE.md` and the docs they point to, then in the git host's issues, then ask the user. When you had to search, offer to save what you found to `docs/agents/issue-tracker.md` for next time: where tickets live, which states exist, how a ticket is opened, updated and closed, and which index to regenerate.
 
 The project's conventions override any habit of this skill: ticket format, status vocabulary, closing procedure, indexes to regenerate.
 

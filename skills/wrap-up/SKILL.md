@@ -32,7 +32,9 @@ Read-only, whole repo. Without an `origin` remote, `--fetch` is skipped and the 
 
 ## 3. Tickets
 
-Find how the repo tracks work. Its `AGENTS.md` / `CLAUDE.md` point to it. Apply its rules to every footprint ticket:
+Read the repo's tracker docs, `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`, if they exist. Without them, look in `AGENTS.md` / `CLAUDE.md` and the docs they point to, then in the git host's issues, then ask the user. When you had to search, offer to save what you found to `docs/agents/issue-tracker.md` for next time: where tickets live, which states exist, how a ticket is opened, updated and closed, and which index to regenerate.
+
+Apply the tracker's rules to every footprint ticket:
 
 - finished → closed the way the repo closes tickets, with the date and the commit SHA;
 - partial → its state says, with today's date, what is left and who holds it;
@@ -80,4 +82,4 @@ One line per area (tickets, commits, merge, worktrees), each marked done, partia
 - what the report showed outside the footprint, left alone;
 - commits in the base not yet pushed.
 
-If the session's work is unfinished, suggest a handoff: the `handoff` skill where installed; otherwise, a note in the final report that lets a fresh session resume without this conversation (the goal, what is done with its commits, what is left with its tickets, and the branch or worktree it sits on).
+If the session's work is unfinished, end the final report with a handoff note that lets a fresh session resume without this conversation: the goal, what is done with its commits, what is left with its tickets, and the branch or worktree it sits on.

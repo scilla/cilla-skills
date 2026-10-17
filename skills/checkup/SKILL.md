@@ -43,12 +43,30 @@ A subagent's report is a claim. Re-run one command for each top-ranked finding, 
 
 ## 4. Report
 
-Write in the user's language and open with the overall verdict in one sentence. Then:
+Write in the user's language, headings included, in this shape:
 
-1. findings ranked by impact, urgent first (exposed secrets, missing guardrails);
-2. inventory tables with item, usage, verdict and reason;
-3. what to keep;
-4. the open points as a numbered list.
+````markdown
+<overall verdict, one sentence>
+
+## Findings
+
+1. **<finding>**, <dimension>. <evidence: counts, `file:line`, dates>. <impact>. Fix: <the concrete change>.
+
+## <inventory, such as MCP servers>
+
+| Item | Usage in window | Verdict | Reason |
+|---|---|---|---|
+
+## Keep
+
+- <what works and should stay>
+
+## Open points
+
+1. <a decision for the user>
+````
+
+Rank findings by impact, urgent first (exposed secrets, missing guardrails). Leave out the inventory section when the scope has no inventory.
 
 **Done when** every finding carries evidence and a fix, and every inventory row a verdict.
 
