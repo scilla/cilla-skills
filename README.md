@@ -13,6 +13,7 @@ GitHub Copilot and others.
 | `dispatch-and-triage` | Triages pending tickets one question at a time and dispatches each ticket as soon as it is ready. |
 | `design-lab` | Builds variants of a page or component on the `/design-lab` route, to compare, pick and bring into the product. |
 | `checkup` | Examines how you work with the agent, in your repos and in your agent setup. It measures and recommends, and changes nothing until you choose what to apply. |
+| `prompt-master` | Rewrites a task or prompt into a deeper version, the way a top professional in the field would approach it. Better sources, named methods and an outside check, for the same deliverable. |
 
 ## Install
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Prompt Master"
+  short_description: "Rewrite a prompt the way a top professional would"
+policy:
+  allow_implicit_invocation: false
